@@ -13,7 +13,7 @@ logging.config(["Request Handler Deferred", "Request Handler Route","Request Han
                         data: "",
                         contentType: "text/plain"
                     });
-                },1000);
+                },5000);
             });
         });
     };
