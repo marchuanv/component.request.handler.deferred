@@ -1,6 +1,6 @@
-const logging = require("logging");
 const componentRequestHandlerRoute = require("component.request.handler.route");
-
+const logging = require("logging");
+logging.config.add("Request Handler Deferred");
 module.exports = { 
     sessions: [],
     handle: ({ port, path }) => {
