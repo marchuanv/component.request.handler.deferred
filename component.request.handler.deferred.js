@@ -3,10 +3,10 @@ const logging = require("logging");
 logging.config.add("Request Handler Deferred");
 module.exports = { 
     sessions: [],
-    handle: ({ port, path }) => {
+    handle: (options) => {
         return new Promise(async (resovle) => {
             const requeue = async () => {
-                (await componentRequestHandlerRoute.handle( { port, path })).receive(async(request) => {
+                (await componentRequestHandlerRoute.handle(options)).receive(async(request) => {
                     requeue();
                     let results = { headers: {}, statusCode: -1, statusMessage: "" };
                     const resultsPromise = new Promise((resultsResolve, resultsReject) => {
