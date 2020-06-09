@@ -10,7 +10,7 @@ module.exports = {
                 let tryCount = 0;
                 const intervalId = setInterval(() => {
                     tryCount = tryCount + 1;
-                    if (results && results.statusCode === 200){
+                    if (results && results.statusCode > 0){
                         clearInterval(intervalId);
                         resolve(results);
                     } else if (tryCount === 30) {
