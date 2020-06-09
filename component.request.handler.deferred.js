@@ -1,51 +1,31 @@
-const componentRequestHandlerRoute = require("component.request.handler.route");
+const requestHandler = require("component.request.handler.route");
+const delegate = require("component.delegate");
 const logging = require("logging");
 logging.config.add("Request Handler Deferred");
 module.exports = { 
-    sessions: [],
-    handle: (options) => {
-        return new Promise(async (resovle) => {
-            const requeue = async () => {
-                (await componentRequestHandlerRoute.handle(options)).receive(async(request) => {
-                    requeue();
-                    let results = { headers: {}, statusCode: -1, statusMessage: "" };
-                    const resultsPromise = new Promise((resultsResolve, resultsReject) => {
-                        resovle({ receive: async (callback) => {
-                            let tryCount = 0;
-                            const intervalId = setInterval(() => {
-                                tryCount = tryCount + 1;
-                                if (results && results.statusCode === 200){
-                                    clearInterval(intervalId);
-                                } else if (tryCount === 4) {
-                                    clearInterval(intervalId);
-                                    resultsResolve({
-                                        statusCode: 202,
-                                        statusMessage: "Request Deffered",
-                                        data: "",
-                                        contentType: "text/plain"
-                                    });
-                                }
-                            },1000);
-                            results = callback(request);
-                            if (results && results.then){
-                                results = await results.catch((error)=>{
-                                    logging.write("Request Handler Deferred"," ", error.toString());
-                                    resultsReject(error);
-                                });
-                            }
-                            if (results){
-                                resultsResolve(results)
-                            } else {
-                                logging.write("Request Handler Deferred",`callback did not return any data`);
-                                return resultsReject("callback did not return any data.");
-                            }
-                        }});
-                    });
-                    results = await resultsPromise;
-                    return results;
-                });
-            };
-            requeue();
+    handle: ({ callingModule, port, path }) => {
+        delegate.register("component.request.handler.deferred", (request) => {
+            return new Promise(async(resolve) => {
+                let results = { headers: {}, statusCode: -1, statusMessage: "" };
+                let tryCount = 0;
+                const intervalId = setInterval(() => {
+                    tryCount = tryCount + 1;
+                    if (results && results.statusCode === 200){
+                        clearInterval(intervalId);
+                        resolve(results);
+                    } else if (tryCount === 30) {
+                        clearInterval(intervalId);
+                        const message = "Request Deffered";
+                        results.statusCode = 202;
+                        results.statusMessage = message;
+                        results.headers = { "Content-Type":"text/plain", "Content-Length": Buffer.byteLength(message) };
+                        results.data = message;
+                        resolve(results);
+                    }
+                },100);
+                results = await delegate.call(callingModule, request);
+            });
         });
+        requestHandler.handle({ callingModule: "component.request.handler.deferred", port, path });
     }
 };
