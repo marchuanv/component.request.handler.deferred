@@ -2,10 +2,11 @@ const requestHandler = require("./component.request.handler.deferred.js");
 const delegate = require("component.delegate");
 (async()=>{ 
     const callingModule = "component.request.handler.secure";
-    delegate.register(callingModule, (callback) => {
-        return new Promise((resolve) => {
+    delegate.register(callingModule, () => {
+        return new Promise((resolve,reject) => {
             setTimeout(() => {
-                resolve({ statusCode: 200, statusMessage: "Success", headers: {}, data: null });
+                reject("Something went wrong");
+                //resolve({ statusCode: 200, statusMessage: "Success", headers: {}, data: null });
             },4000);
         });
     });

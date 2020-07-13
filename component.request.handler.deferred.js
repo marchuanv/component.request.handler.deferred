@@ -6,58 +6,53 @@ logging.config.add("Request Handler Deferred");
 module.exports = {
     sessions: [],
     handle: ({ callingModule, port, path }) => {
-        delegate.register("component.request.handler.deferred", (request) => {
+        const defer = (request) => {
             return new Promise(async(resolve) => {
-                const deferredMessage = "Request Deffered";
                 let { deferredsessionid } = request.headers;
-                deferredsessionid = deferredsessionid || utils.generateGUID();
                 let deferredSession = module.exports.sessions.find(session => session.id === deferredsessionid);
-                if (deferredSession && deferredSession.completed === true){
-                    module.exports.sessions = module.exports.sessions.filter(session => session.id !== deferredSession.id)
-                    return resolve(deferredSession.results);
+                if (deferredSession){
+                    if (deferredSession.completed === true){
+                        module.exports.sessions = module.exports.sessions.filter(session => session.id !== deferredSession.id)
+                    }
+                    if (deferredSession.results.error){
+                        const statusMessage = "500 Internal Server Error";
+                        deferredSession.results.statusCode = 500;
+                        deferredSession.results.statusMessage = statusMessage;
+                        deferredSession.results.data = statusMessage;
+                        deferredSession.results.headers = { 
+                            "Content-Type":"text/plain", 
+                            "Content-Length": Buffer.byteLength(statusMessage)
+                        };
+                    }
+                    resolve(deferredSession.results);
                 } else {
+                    const statusMessage = "Request Deffered";
+                    const deferredsessionid = utils.generateGUID();
                     deferredSession = {
                         id: deferredsessionid,
-                        results: { headers: {}, statusCode: -1, statusMessage: "" },
+                        results: { 
+                            headers: { 
+                                "Content-Type":"text/plain", 
+                                "Content-Length": Buffer.byteLength(statusMessage),
+                                deferredsessionid
+                            }, 
+                            statusCode: 202, 
+                            statusMessage,
+                            data: statusMessage
+                        },
                         completed: false
                     };
+                    request.headers.deferredsessionid = deferredsessionid;
                     module.exports.sessions.push(deferredSession);
+                    setTimeout(async () => {
+                        resolve(await defer(request));
+                    },10);
+                    deferredSession.results = await delegate.call(callingModule, request);
+                    deferredSession.completed = true;
                 }
-                let tryCount = 0;
-                const intervalId = setInterval(() => {
-                    tryCount = tryCount + 1;
-                    if (deferredSession.results.statusCode === 200){
-                        deferredSession.completed = true;
-                        clearInterval(intervalId);
-                        resolve(deferredSession.results);
-                    } else if (tryCount === 30 && deferredSession.results.statusCode === -1) { //Timeout defer
-                        deferredSession.completed = false;
-                        deferredSession.results.statusCode = 202;
-                        deferredSession.results.statusMessage = deferredMessage;
-                        deferredSession.results.headers = { 
-                            "Content-Type":"text/plain", 
-                            "Content-Length": Buffer.byteLength(deferredMessage),
-                            deferredsessionid
-                        };
-                        deferredSession.results.data = deferredMessage;
-                        deferredSession.completed = false;
-                        resolve(deferredSession.results);
-                    }  else if (tryCount === 200 && deferredSession.results.statusCode === -1) { //taking too long fail deferred request
-                        clearInterval(intervalId);
-                        deferredSession.completed = true;
-                        deferredSession.results.statusCode = 500;
-                        deferredSession.results.statusMessage = "deferred request failed";
-                        deferredSession.results.headers = { 
-                            "Content-Type":"text/plain", 
-                            "Content-Length": Buffer.byteLength(deferredSession.results.statusMessage),
-                            deferredsessionid: deferredSession.id
-                        };
-                        deferredSession.results.data = deferredSession.results.statusMessage;
-                    }
-                },100);
-                deferredSession.results = await delegate.call(callingModule, request);
             });
-        });
+        };
+        delegate.register("component.request.handler.deferred", defer);
         requestHandler.handle({ callingModule: "component.request.handler.deferred", port, path });
     }
 };
