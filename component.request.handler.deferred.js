@@ -46,7 +46,7 @@ module.exports = {
                     module.exports.sessions.push(deferredSession);
                     setTimeout(async () => {
                         resolve(await defer(request));
-                    },10);
+                    },1000);
                     deferredSession.results = await delegate.call(callingModule, request);
                     deferredSession.completed = true;
                 }
