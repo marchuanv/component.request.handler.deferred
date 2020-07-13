@@ -15,7 +15,7 @@ module.exports = {
                         module.exports.deferredRequests = module.exports.deferredRequests.filter(req => req.id !== deferredReq.id)
                     }
                     if (deferredReq.results.error){
-                        const statusMessage = "500 Internal Server Error";
+                        const statusMessage = "Internal Server Error";
                         deferredReq.results.statusCode = 500;
                         deferredReq.results.statusMessage = statusMessage;
                         deferredReq.results.data = statusMessage;
