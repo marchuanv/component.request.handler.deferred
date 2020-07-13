@@ -52,7 +52,8 @@ module.exports = {
                 }
             });
         };
-        delegate.register("component.request.handler.deferred", defer);
-        requestHandler.handle({ callingModule: "component.request.handler.deferred", port, path });
+        const currentModule = `component.request.handler.deferred.${path.replace("/","")}`;
+        delegate.register(currentModule, defer);
+        requestHandler.handle(currentModule, { port, path });
     }
 };
