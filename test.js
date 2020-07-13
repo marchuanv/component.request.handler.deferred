@@ -10,7 +10,7 @@ const delegate = require("component.delegate");
             },4000);
         });
     });
-    await requestHandler.handle({ callingModule, port: 3000, path: "/test" });
+    await requestHandler.handle(callingModule, { port: 3000, path: "/test" });
 })().catch((err)=>{
     console.error(err);
 });
