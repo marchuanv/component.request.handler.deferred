@@ -52,7 +52,7 @@ module.exports = {
                 }
             });
         }; 
-        const thisModule = `component.request.handler.deferred.${options.path.replace(/\//g,"")}.${options.port}`;
+        const thisModule = `component.request.handler.deferred.${path.replace(/\//g,"")}.${port}`;
         delegate.register(thisModule, defer);
         requestHandler.handle(thisModule, { port, path });
     }
