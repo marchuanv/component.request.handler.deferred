@@ -51,9 +51,9 @@ module.exports = {
                     deferredReq.completed = true;
                 }
             });
-        };
-        const currentModule = `component.request.handler.deferred.${path.replace(/\//g,"")}`;
-        delegate.register(currentModule, defer);
-        requestHandler.handle(currentModule, { port, path });
+        }; 
+        const thisModule = `component.request.handler.deferred.${options.path.replace(/\//g,"")}.${options.port}`;
+        delegate.register(thisModule, defer);
+        requestHandler.handle(thisModule, { port, path });
     }
 };
