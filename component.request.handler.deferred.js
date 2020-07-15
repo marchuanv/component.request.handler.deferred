@@ -5,7 +5,7 @@ const logging = require("logging");
 logging.config.add("Request Handler Deferred");
 module.exports = {
     deferredRequests: [],
-    handle: (callingModule, { port, path }) => {
+    handle: (callingModule, { host, port, path }) => {
         const defer = (request) => {
             return new Promise(async(resolve) => {
                 let { deferredrequestid } = request.headers;
@@ -54,6 +54,6 @@ module.exports = {
         }; 
         const thisModule = `component.request.handler.deferred.${path.replace(/\//g,"")}.${port}`;
         delegate.register(thisModule, defer);
-        requestHandler.handle(thisModule, { port, path });
+        requestHandler.handle(thisModule, { host, port, path });
     }
 };
