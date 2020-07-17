@@ -1,16 +1,15 @@
-const requestHandler = require("./component.request.handler.deferred.js");
+const requestHandlerDeferred = require("./component.request.handler.deferred.js");
 const delegate = require("component.delegate");
 (async()=>{ 
-    const callingModule = "component.request.handler.secure";
+    const callingModule = "component.request.handler.secure.login";
     delegate.register(callingModule, () => {
-        return new Promise((resolve,reject) => {
+        return new Promise((reject) => {
             setTimeout(() => {
                 reject("Something went wrong");
-                //resolve({ statusCode: 200, statusMessage: "Success", headers: {}, data: null });
             },4000);
         });
     });
-    await requestHandler.handle(callingModule, { port: 3000, path: "/test" });
+    await requestHandlerDeferred.handle(callingModule, { publicPort: 3000, path: "/test" });
 })().catch((err)=>{
     console.error(err);
 });
