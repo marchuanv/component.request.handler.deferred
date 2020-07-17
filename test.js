@@ -1,7 +1,7 @@
 const requestHandlerDeferred = require("./component.request.handler.deferred.js");
 const delegate = require("component.delegate");
 (async()=>{ 
-    const callingModule = "component.request.handler.secure.login";
+    const callingModule = "component.request.handler.user";
     delegate.register(callingModule, () => {
         return new Promise((reject) => {
             setTimeout(() => {
