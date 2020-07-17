@@ -53,8 +53,8 @@ module.exports = {
     deferredRequests: [],
     handle: (callingModule, options) => {
         const thisModule = `component.request.handler.deferred.${options.path.replace(/\//g,"")}.${options.publicPort}`;
-        delegate.register(thisModule, (request)=>{
-            defer(callingModule, options, request);
+        delegate.register(thisModule, async (request) => {
+            return await defer(callingModule, options, request);
         });
         requestHandlerRoute.handle(thisModule, options);
     }
