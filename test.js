@@ -9,7 +9,7 @@ const delegate = require("component.delegate");
             },4000);
         });
     });
-    await requestHandlerDeferred.handle(callingModule, { publicPort: 3000, path: "/test" });
+    await requestHandlerDeferred.handle(callingModule, { privatePort: 3000, path: "/test" });
 })().catch((err)=>{
     console.error(err);
 });
