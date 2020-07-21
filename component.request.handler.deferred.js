@@ -16,10 +16,7 @@ const defer = (callingModule, options, request) => {
                 deferredReq.results.statusCode = 500;
                 deferredReq.results.statusMessage = statusMessage;
                 deferredReq.results.data = statusMessage;
-                deferredReq.results.headers = { 
-                    "Content-Type":"text/plain", 
-                    "Content-Length": Buffer.byteLength(statusMessage)
-                };
+                deferredReq.results.headers = {"Content-Type":"text/plain"};
             }
             resolve(deferredReq.results);
         } else {
@@ -29,8 +26,7 @@ const defer = (callingModule, options, request) => {
                 id: deferredrequestid,
                 results: { 
                     headers: { 
-                        "Content-Type":"text/plain", 
-                        "Content-Length": Buffer.byteLength(statusMessage),
+                        "Content-Type":"text/plain",
                         deferredrequestid
                     }, 
                     statusCode: 202, 
@@ -44,18 +40,19 @@ const defer = (callingModule, options, request) => {
             setTimeout(async () => {
                 resolve(await defer(callingModule, options, request));
             },1000);
-            deferredReq.results = await delegate.call(callingModule, request);
+            deferredReq.results = await delegate.call( {context: callingModule}, request);
             deferredReq.completed = true;
         }
     });
 }; 
 module.exports = {
     deferredRequests: [],
-    handle: (callingModule, options) => {
-        const thisModule = `component.request.handler.deferred.${options.path.replace(/\//g,"")}.${options.publicPort}`;
-        delegate.register(thisModule, async (request) => {
-            return await defer(callingModule, options, request);
+    handle: (options) => {
+        delegate.register("component.request.handler.deferred", "defer", async (request) => {
+            if (options.privatePort === request.privatePort){
+                return await defer("component.request.handler.user", options, request);
+            }
         });
-        requestHandlerRoute.handle(thisModule, options);
+        requestHandlerRoute.handle(options);
     }
 };
