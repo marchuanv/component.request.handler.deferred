@@ -3,7 +3,7 @@ const delegate = require("component.delegate");
 const utils = require("utils");
 const logging = require("logging");
 logging.config.add("Request Handler Deferred");
-const defer = (callingModule, options, request) => {
+const defer = (callingModule, name, options, request) => {
     return new Promise(async(resolve) => {
         let { deferredrequestid } = request.headers;
         let deferredReq = module.exports.deferredRequests.find(req => req.id === deferredrequestid);
@@ -38,9 +38,9 @@ const defer = (callingModule, options, request) => {
             request.headers.deferredrequestid = deferredrequestid;
             module.exports.deferredRequests.push(deferredReq);
             setTimeout(async () => {
-                resolve(await defer(callingModule, options, request));
+                resolve(await defer(callingModule, name, options, request));
             },1000);
-            deferredReq.results = await delegate.call( {context: callingModule}, request);
+            deferredReq.results = await delegate.call( {context: callingModule, name}, request);
             deferredReq.completed = true;
         }
     });
@@ -49,10 +49,9 @@ module.exports = {
     deferredRequests: [],
     handle: (options) => {
         requestHandlerRoute.handle(options);
-        delegate.register(`component.request.handler.deferred.${options.path}`, "defer", async (request) => {
-            if (options.publicPort === request.publicPort){
-                return await defer(`component.request.handler.user.${request.path}`, options, request);
-            }
+        const name = `${options.publicPort}${options.path}`;
+        delegate.register(`component.request.handler.deferred`, name, async (request) => {
+            return await defer(`component.request.handler.user`, name, options, request);
         });
     }
 };
