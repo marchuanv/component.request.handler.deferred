@@ -48,11 +48,11 @@ const defer = (callingModule, options, request) => {
 module.exports = {
     deferredRequests: [],
     handle: (options) => {
+        requestHandlerRoute.handle(options);
         delegate.register("component.request.handler.deferred", "defer", async (request) => {
-            if (options.privatePort === request.privatePort){
+            if (options.publicPort === request.publicPort){
                 return await defer("component.request.handler.user", options, request);
             }
         });
-        requestHandlerRoute.handle(options);
     }
 };
