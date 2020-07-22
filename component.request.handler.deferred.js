@@ -51,7 +51,7 @@ module.exports = {
         requestHandlerRoute.handle(options);
         delegate.register("component.request.handler.deferred", "defer", async (request) => {
             if (options.publicPort === request.publicPort){
-                return await defer("component.request.handler.user", options, request);
+                return await defer(`component.request.handler.user.${request.path}`, options, request);
             }
         });
     }
