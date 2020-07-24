@@ -11,13 +11,6 @@ const defer = (callingModule, name, options, request) => {
             if (deferredReq.completed === true){
                 module.exports.deferredRequests = module.exports.deferredRequests.filter(req => req.id !== deferredReq.id)
             }
-            if (deferredReq.results.error){
-                const statusMessage = "Internal Server Error";
-                deferredReq.results.statusCode = 500;
-                deferredReq.results.statusMessage = statusMessage;
-                deferredReq.results.data = statusMessage;
-                deferredReq.results.headers = {"Content-Type":"text/plain"};
-            }
             resolve(deferredReq.results);
         } else {
             const statusMessage = "Request Deffered";
