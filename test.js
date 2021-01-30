@@ -11,10 +11,10 @@ const delegate = require("component.delegate");
             },4000);
         });
     });
-    await requestHandlerDeferred.handle({ publicPort: 3000, publicHost: "localhost", privatePort: 3000, privateHost: "localhost", path: "/test" });
-    await requestHandlerDeferred.handle({ publicPort: 4000, publicHost: "localhost", privatePort: 4000, privateHost: "localhost", path: "/test" });
-    await requestHandlerDeferred.handle({ publicPort: 3000, publicHost: "localhost", privatePort: 3000, privateHost: "localhost", path: "/authenticate" });
-    await requestHandlerDeferred.handle({ publicPort: 4000, publicHost: "localhost", privatePort: 4000, privateHost: "localhost", path: "/authenticate" });
+    await requestHandlerDeferred.handle({ port: 3000, host: "localhost", path: "/test" });
+    await requestHandlerDeferred.handle({ port: 4000, host: "localhost", path: "/test" });
+    await requestHandlerDeferred.handle({ port: 3000, host: "localhost", path: "/authenticate" });
+    await requestHandlerDeferred.handle({ port: 4000, host: "localhost", path: "/authenticate" });
 })().catch((err)=>{
     console.error(err);
 });

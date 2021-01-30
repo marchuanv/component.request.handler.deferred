@@ -42,7 +42,7 @@ module.exports = {
     deferredRequests: [],
     handle: (options) => {
         requestHandlerRoute.handle(options);
-        const name = `${options.publicPort}${options.path}`;
+        const name = `${options.port}${options.path}`;
         delegate.register(`component.request.handler.deferred`, name, async (request) => {
             return await defer(`component.request.handler.user`, name, options, request);
         });
