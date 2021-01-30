@@ -2,6 +2,9 @@ const requestHandlerDeferred = require("./component.request.handler.deferred.js"
 const delegate = require("component.delegate");
 (async()=>{ 
     delegate.register("component.request.handler.user", "3000/authenticate",() => {
+        return { statusCode: 200, statusMessage: "Success", headers: {}, data: "authenticate passed" };
+    });
+    delegate.register("component.request.handler.user", "3000/test",() => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: "test passed" };
     });
     delegate.register("component.request.handler.user", "4000/authenticate",() => {

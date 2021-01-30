@@ -3,7 +3,7 @@ const delegate = require("component.delegate");
 const utils = require("utils");
 const logging = require("logging");
 logging.config.add("Request Handler Deferred");
-const defer = (callingModule, name, options, request) => {
+const defer = (callingModule, name, request) => {
     return new Promise(async(resolve) => {
         let { deferredrequestid } = request.headers;
         let deferredReq = module.exports.deferredRequests.find(req => req.id === deferredrequestid);
@@ -31,7 +31,7 @@ const defer = (callingModule, name, options, request) => {
             request.headers.deferredrequestid = deferredrequestid;
             module.exports.deferredRequests.push(deferredReq);
             setTimeout(async () => {
-                resolve(await defer(callingModule, name, options, request));
+                resolve(await defer(callingModule, name, request));
             },1000);
             deferredReq.results = await delegate.call( {context: callingModule, name}, request);
             deferredReq.completed = true;
@@ -44,7 +44,7 @@ module.exports = {
         requestHandlerRoute.handle(options);
         const name = `${options.port}${options.path}`;
         delegate.register(`component.request.handler.deferred`, name, async (request) => {
-            return await defer(`component.request.handler.user`, name, options, request);
+            return await defer(`component.request.handler.user`, name, request);
         });
     }
 };
