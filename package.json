@@ -24,5 +24,8 @@
     "logging": "git+https://github.com/marchuanv/logging.git",
     "component.request.handler.route": "git+https://github.com/marchuanv/component.request.handler.route.git",
     "component.delegate": "git+https://github.com/marchuanv/component.delegate.git"
+  },
+  "devDependencies": {
+    "component.request": "git+https://github.com/marchuanv/component.request.git"
   }
 }

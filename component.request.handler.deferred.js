@@ -33,7 +33,7 @@ const defer = (callingModule, name, request) => {
             setTimeout(async () => {
                 resolve(await defer(callingModule, name, request));
             },1000);
-            deferredReq.results = await delegate.call( {context: callingModule, name}, request);
+            deferredReq.results = await delegate.call( { context: callingModule, name }, request);
             deferredReq.completed = true;
         }
     });
