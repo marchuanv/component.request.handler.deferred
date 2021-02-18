@@ -14,7 +14,7 @@ const defer = (callingModule, name, request) => {
             resolve(deferredReq.results);
         } else {
             const statusMessage = "Request Deffered";
-            const deferredrequestid = utils.generateGUID();
+            deferredrequestid = utils.generateGUID();
             deferredReq = {
                 id: deferredrequestid,
                 results: { 
