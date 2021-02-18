@@ -32,7 +32,7 @@ const defer = (callingModule, name, request) => {
             module.exports.deferredRequests.push(deferredReq);
             setTimeout(async () => {
                 resolve(await defer(callingModule, name, request));
-            },1000);
+            },4000);
             deferredReq.results = await delegate.call( { context: callingModule, name }, request);
             deferredReq.completed = true;
         }
