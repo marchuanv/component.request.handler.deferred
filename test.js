@@ -1,37 +1,40 @@
 const requestHandlerDeferred = require("./component.request.handler.deferred.js");
-const request = require("component.request");
+const requestUnsecure = require("component.request.unsecure");
 const delegate = require("component.delegate");
-(async()=>{ 
-    delegate.register("component.request.handler.user", "3000/test",() => {
+(async()=>{
+
+    const newUnsecureRequestA = { host: "localhost", port: 3000, path: "/test" };
+    const newUnsecureRequestB = { host: "localhost", port: 3000, path: "/test" };
+
+    delegate.register("component.request.handler.user", `${newUnsecureRequestA.port}${newUnsecureRequestA.path}`,() => {
         return { statusCode: 200, statusMessage: "Success", headers: {}, data: "test passed" };
     });
-    delegate.register("component.request.handler.user", "4000/test",() => {
+    delegate.register("component.request.handler.user", `${newUnsecureRequestB.port}${newUnsecureRequestB.path}`,() => {
         return new Promise((reject) => {
             setTimeout(() => {
                 reject("Something went wrong");
             },4000);
         });
     });
-    await requestHandlerDeferred.handle({ port: 3000, host: "localhost", path: "/test" });
-    await requestHandlerDeferred.handle({ port: 4000, host: "localhost", path: "/test" });
+    await requestHandlerDeferred.handle(newUnsecureRequestA);
+    await requestHandlerDeferred.handle(newUnsecureRequestB);
 
-    let results = await request.send({ 
-        host: "localhost",
-        port: 3000,
-        path: "/test",
+    let results = await requestUnsecure.send({ 
+        host: newUnsecureRequestA.host,
+        port: newUnsecureRequestA.port,
+        path: newUnsecureRequestA.path,
         method: "GET",
         headers: {}, 
-        data: "",
-        retryCount: 1
+        data: ""
     });
     if (results.statusCode !== 200){
         throw "deferred test for port 3000 failed";
     }
 
-    results = await request.send({ 
-        host: "localhost",
-        port: 4000,
-        path: "/test",
+    results = await requestUnsecure.send({ 
+        host: newUnsecureRequestB.host,
+        port: newUnsecureRequestB.port,
+        path: newUnsecureRequestB.path,
         method: "GET",
         headers: {}, 
         data: "",
@@ -41,6 +44,7 @@ const delegate = require("component.delegate");
         throw "deferred test for port 4000 failed";
     }
 
+    process.exit();
 
 })().catch((err)=>{
     console.error(err);
