@@ -6,10 +6,10 @@ logging.config.add("Request Handler Deferred");
 const defer = (callingModule, name, request) => {
     return new Promise(async(resolve) => {
         let { deferredrequestid } = request.headers;
+        delete request.headers["deferredrequestid"];
         let deferredReq = module.exports.deferredRequests.find(req => req.id === deferredrequestid);
         if (deferredReq){
             if (deferredReq.completed === true){
-                delete request.headers["deferredrequestid"];
                 module.exports.deferredRequests = module.exports.deferredRequests.filter(req => req.id !== deferredReq.id)
             }
             resolve(deferredReq.results);
