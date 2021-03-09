@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "main": "component.request.handler.deferred.js",
+  "hostname":"localhost",
+  "port": 3000,
   "engines": {
     "node": "12.16.1",
     "npm": "6.13.4"
